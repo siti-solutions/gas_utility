@@ -2,6 +2,15 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class Account(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    account_number = models.CharField(max_length=20, unique=True)
+    address = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=15)
+
+    def __str__(self):
+        return self.account_number
+
 class ServiceRequest(models.Model):
     TYPE_CHOICES = [
         ('gas_leak', 'Gas Leak'),
@@ -19,16 +28,6 @@ class ServiceRequest(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.request_type}"
 
-class Account(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    account_number = models.CharField(max_length=20, unique=True)
-    address = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=15)
-
-    def __str__(self):
-        return self.account_number
-
-# service/models.py
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.CharField(max_length=255)
@@ -38,15 +37,11 @@ class Notification(models.Model):
     def __str__(self):
         return f"Notification for {self.user.username}"
 
-# service/models.py (update ServiceRequest model's save method)
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+class Comment(models.Model):
+    request = models.ForeignKey(ServiceRequest, related_name='comments', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
-@receiver(post_save, sender=ServiceRequest)
-def create_notification(sender, instance, **kwargs):
-    if instance.status != 'Pending':
-        Notification.objects.create(
-            user=instance.user,
-            message=f"Your service request {instance.request_type} status has been updated to {instance.status}"
-        )
-
+    def __str__(self):
+        return f"Comment by {self.user.username} on {self.request.id}"

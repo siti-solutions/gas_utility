@@ -7,5 +7,4 @@ urlpatterns = [
     path('status/<int:request_id>/', views.request_status, name='request_status'),
     path('notifications/', views.notifications, name='notifications'),
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
-
 ]
