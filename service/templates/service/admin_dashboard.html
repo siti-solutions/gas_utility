@@ -1,0 +1,30 @@
+<!-- service/templates/service/admin_dashboard.html -->
+<h2>Admin Dashboard</h2>
+<form method="GET">
+    {{ form.as_p }}
+    <button type="submit">Search</button>
+</form>
+<table>
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Request Type</th>
+            <th>Status</th>
+            <th>Date Submitted</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for request in requests %}
+        <tr>
+            <td>{{ request.user.username }}</td>
+            <td>{{ request.request_type }}</td>
+            <td>{{ request.status }}</td>
+            <td>{{ request.created_at }}</td>
+            <td>
+                <a href="{% url 'update_request_status' request.id %}">Update Status</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
